@@ -78,7 +78,7 @@ class TarFile
     @file.seek(0, IO::SEEK_END)
     files_to_append.each do |file_path|
       input_file = File.open(file_path, 'rb')
-      base_name = File.basename(input_file)
+      base_name = Marshal.dump(File.basename(input_file))
       @file.write([base_name.size, input_file.size].pack('qq'))
       @file.write(base_name)
       while buffer = input_file.read(BUFFER_SIZE)
@@ -92,7 +92,7 @@ class TarFile
     @file.seek(0)
     while buffer = @file.read(16)
       path_size, file_size = buffer.unpack('qq')
-      path = @file.read(path_size)
+      path = Marshal.load(@file.read(path_size))
       path = File.join(dir, path) if dir
       File.open(path, 'wb') do |f|
         (file_size / BUFFER_SIZE).times { f.write(@file.read(BUFFER_SIZE)) }
@@ -106,7 +106,7 @@ class TarFile
     @file.seek(0)
     while buffer = @file.read(16)
       path_size, file_size = buffer.unpack('qq')
-      res << { name: @file.read(path_size), size: file_size }
+      res << { name: Marshal.load(@file.read(path_size)), size: file_size }
       @file.seek(file_size, IO::SEEK_CUR)
     end
     res

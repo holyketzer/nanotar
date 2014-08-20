@@ -3,6 +3,7 @@ require 'nanotar'
 
 class NanotarTest < Test::Unit::TestCase
   SRC_FILES = ['a.txt', 'b.txt'].map { |name| File.join('fixtures', name) }
+  UNICODE_SRC_FILE = File.join('fixtures', 'абвгд.файл')
   EXTRACT_DIR = 'tmp'
   TAR_FILE = File.join(EXTRACT_DIR, 'test.tar')
 
@@ -66,5 +67,14 @@ class NanotarTest < Test::Unit::TestCase
 
     tar.append(other_src)
     assert_equal SRC_FILES.size, tar.list.size
+  end
+
+  def test_with_unicode_file_name
+    tar = TarFile.create(TAR_FILE, UNICODE_SRC_FILE)
+
+    expected = [{ name: File.basename(UNICODE_SRC_FILE), size: File.size(UNICODE_SRC_FILE)}]
+    list = tar.list
+    assert_equal 1, list.size
+    assert_equal expected, list
   end
 end

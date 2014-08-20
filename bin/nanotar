@@ -25,6 +25,14 @@ begin
         TarCommand.list(args.first).each { |file| puts "#{file[:name]} = #{file[:size]} bytes" }
       end
     end
+
+    on 'v', 'version', 'Show version' do
+      run do
+        require 'rubygems'
+        spec = Gem::Specification::load('nanotar.gemspec')
+        puts spec.version
+      end
+    end
   end
 rescue TarCommand::TarCommandError, Slop::InvalidOptionError => e
   puts e.message
