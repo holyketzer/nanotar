@@ -1,26 +1,56 @@
-module TarUtils
-  # option parser, slop
+module TarCommand
+  class TarCommandError < Exception
+  end
+
   class << self
     def create(output_file_name, *input_file_names)
+      assert_file_not_exists(output_file_name)
+      assert_files_exist(*input_file_names)
+      assert_source_files(input_file_names)
       TarFile.create(output_file_name, input_file_names)
     end
 
     def append(output_file_name, *input_file_names)
+      assert_files_exist(output_file_name, *input_file_names)
+      assert_source_files(input_file_names)
       TarFile.create(output_file_name, input_file_names)
     end
 
     def extract(tar_file_name, dir = nil)
+      assert_files_exist(tar_file_name)
+      assert_directory_exist(dir) if dir
       TarFile.new(tar_file_name).extract(dir)
     end
 
     def list(tar_file_name)
+      assert_files_exist(tar_file_name)
       TarFile.new(tar_file_name).list
+    end
+
+    private
+
+    def assert_files_exist(*files)
+      files.each do |path|
+        raise TarCommandError.new("File not found '#{path}'") unless File.exists?(path)
+      end
+    end
+
+    def assert_directory_exist(dir)
+      raise TarCommandError.new("Directory not found '#{dir}'") unless Dir.exists?(dir)
+    end
+
+    def assert_source_files(files)
+      raise TarCommandError.new("At least one source file required") unless files.any?
+    end
+
+    def assert_file_not_exists(file)
+      raise TarCommandError.new("Tar file '#{file}' already exists") if File.exists?(file)
     end
   end
 end
 
 class TarFile
-  BUFFER_SIZE = 1024 * 1024
+  BUFFER_SIZE = 8 * 1024
 
   def initialize(tar_path, files_to_append = nil)
     if File.exists? tar_path

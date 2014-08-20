@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'nanotar'
-  s.version     = '0.0.1'
+  s.version     = '1.0.0'
   s.executables << 'nanotar'
   s.date        = '2014-08-19'
   s.summary     = 'Tar utility'

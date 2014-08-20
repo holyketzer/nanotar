@@ -3,25 +3,29 @@
 require 'nanotar'
 require 'slop'
 
-opts = Slop.parse(help: true) do
-  banner 'Usage: nanotar [options]'
+begin
+  opts = Slop.parse(help: true, strict: true) do
+    banner 'Usage: nanotar [options] tarfile [source files]'
 
-  on 'c', 'create', 'Create new tarball file' do
-    run { |opts, args| TarUtils.create(*args) }
-  end
+    on 'c', 'create', 'Create new tarball file' do
+      run { |opts, args| TarCommand.create(*args) }
+    end
 
-  on 'r', 'append', 'Append new files to tarball' do
-    run { |opts, args| TarUtils.append(*args) }
-  end
+    on 'a', 'append', 'Append new files to tarball' do
+      run { |opts, args| TarCommand.append(*args) }
+    end
 
-  on 'x', 'extract', 'Extract files from tarball to current directory', help: true do
-    on 'd=', 'directory=', 'custom extract directory'
-    run { |opts, args| TarUtils.extract(args.first, opts[:directory]) }
-  end
+    on 'x', 'extract', 'Extract files from tarball to current directory', help: true do
+      on 'd=', 'directory=', 'custom extract directory'
+      run { |opts, args| TarCommand.extract(args.first, opts[:directory]) }
+    end
 
-  on 't', 'list', 'List files inside tarball' do
-    run do |opts, args|
-      TarUtils.list(args.first).each { |file| puts "#{file[:name]} = #{file[:size]} bytes" }
+    on 'l', 'list', 'List files inside tarball' do
+      run do |opts, args|
+        TarCommand.list(args.first).each { |file| puts "#{file[:name]} = #{file[:size]} bytes" }
+      end
     end
   end
+rescue TarCommand::TarCommandError, Slop::InvalidOptionError => e
+  puts e.message
 end
