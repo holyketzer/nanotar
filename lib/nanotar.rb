@@ -1,13 +1,20 @@
 module TarUtils
   # option parser, slop
   class << self
-    def create(output_file_name, input_file_names)
+    def create(output_file_name, *input_file_names)
+      puts "#{output_file_name} #{input_file_names.inspect}"
     end
 
-    def append(output_file_name, input_file_names)
+    def append(output_file_name, *input_file_names)
+      puts "#{output_file_name} #{input_file_names.inspect}"
     end
 
-    def extract(tar_file_name)
+    def extract(tar_file_name, dir)
+      puts "#{tar_file_name} #{dir}"
+    end
+
+    def list(tar_file_name)
+      puts "#{tar_file_name}"
     end
   end
 end
@@ -57,6 +64,17 @@ class TarFile
         f.write(@file.read(file_size % BUFFER_SIZE))
       end
     end
+  end
+
+  def list
+    res = []
+    @file.seek(0)
+    while buffer = @file.read(16)
+      path_size, file_size = buffer.unpack('qq')
+      res << { name: @file.read(path_size), size: file_size }
+      @file.seek(file_size, IO::SEEK_CUR)
+    end
+    res
   end
 
   def read_file(file_name)

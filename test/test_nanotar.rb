@@ -47,4 +47,14 @@ class NanotarTest < Test::Unit::TestCase
       end
     end
   end
+
+  def test_list
+    tar = TarFile.create(TAR_FILE, SRC_FILES)
+    expected = SRC_FILES.map { |f| {
+      name: File.basename(f),
+      size: File.size(f)
+    }}
+
+    assert_equal expected, tar.list, 'Tar list should return list of files with size'
+  end
 end
