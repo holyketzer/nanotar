@@ -18,14 +18,14 @@ class NanotarTest < Test::Unit::TestCase
     Dir.chdir('..')
   end
 
-  def test_pack
+  def test_create
     TarFile.create(TAR_FILE, SRC_FILES)
 
     assert File.exists?(TAR_FILE), 'Tar should be created'
     assert File.size(TAR_FILE) > SRC_FILES.map { |f| File.size(f) }.reduce(:+), 'Size of the tar file should be greater than sum of source files sizes'
   end
 
-  def test_unpack
+  def test_extract
     tar = TarFile.create(TAR_FILE, SRC_FILES)
     tar.extract(EXTRACT_DIR)
 
@@ -56,5 +56,15 @@ class NanotarTest < Test::Unit::TestCase
     }}
 
     assert_equal expected, tar.list, 'Tar list should return list of files with size'
+  end
+
+  def test_append
+    first_src, *other_src = SRC_FILES
+
+    tar = TarFile.create(TAR_FILE, first_src)
+    assert_equal 1, tar.list.size
+
+    tar.append(other_src)
+    assert_equal SRC_FILES.size, tar.list.size
   end
 end

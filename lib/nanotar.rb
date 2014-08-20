@@ -2,19 +2,19 @@ module TarUtils
   # option parser, slop
   class << self
     def create(output_file_name, *input_file_names)
-      puts "#{output_file_name} #{input_file_names.inspect}"
+      TarFile.create(output_file_name, input_file_names)
     end
 
     def append(output_file_name, *input_file_names)
-      puts "#{output_file_name} #{input_file_names.inspect}"
+      TarFile.create(output_file_name, input_file_names)
     end
 
-    def extract(tar_file_name, dir)
-      puts "#{tar_file_name} #{dir}"
+    def extract(tar_file_name, dir = nil)
+      TarFile.new(tar_file_name).extract(dir)
     end
 
     def list(tar_file_name)
-      puts "#{tar_file_name}"
+      TarFile.new(tar_file_name).list
     end
   end
 end
@@ -23,7 +23,12 @@ class TarFile
   BUFFER_SIZE = 1024 * 1024
 
   def initialize(tar_path, files_to_append = nil)
-    @file = File.open(tar_path, 'wb+')
+    if File.exists? tar_path
+      @file = File.open(tar_path, 'rb+')
+    else
+      @file = File.open(tar_path, 'wb+')
+    end
+
     if files_to_append
       append(files_to_append)
     end

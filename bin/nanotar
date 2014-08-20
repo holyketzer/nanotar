@@ -1,0 +1,27 @@
+#!/usr/bin/env ruby
+
+require 'nanotar'
+require 'slop'
+
+opts = Slop.parse(help: true) do
+  banner 'Usage: nanotar [options]'
+
+  on 'c', 'create', 'Create new tarball file' do
+    run { |opts, args| TarUtils.create(*args) }
+  end
+
+  on 'r', 'append', 'Append new files to tarball' do
+    run { |opts, args| TarUtils.append(*args) }
+  end
+
+  on 'x', 'extract', 'Extract files from tarball to current directory', help: true do
+    on 'd=', 'directory=', 'custom extract directory'
+    run { |opts, args| TarUtils.extract(args.first, opts[:directory]) }
+  end
+
+  on 't', 'list', 'List files inside tarball' do
+    run do |opts, args|
+      TarUtils.list(args.first).each { |file| puts "#{file[:name]} = #{file[:size]} bytes" }
+    end
+  end
+end
