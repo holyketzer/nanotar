@@ -49,5 +49,6 @@ nanotar -l existing_tar_file.tar
 # Run tests
 
 ```
-rake test
+bundle install
+bundle exec rake test
 ```
