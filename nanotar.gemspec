@@ -12,4 +12,6 @@ Gem::Specification.new do |s|
   s.license     = 'BSD'
 
   s.add_runtime_dependency 'slop', '~> 3.6'
+  s.add_development_dependency 'rake'
+  s.add_development_dependency 'minitest', '~> 4.0'
 end
